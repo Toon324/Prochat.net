@@ -11,6 +11,8 @@ namespace Prochat.Hubs
     [HubName("ChatHub")]
     public class ChatHub : Hub
     {
+        private static int messageNumber = 0;
+
         public void Hello()
         {
             Clients.All.hello();
@@ -20,7 +22,8 @@ namespace Prochat.Hubs
         {
             // Call the addNewMessageToPage method to update clients.
             message = ParseMessage(message);
-            Clients.All.addNewMessageToPage(name, message);
+            Clients.All.addNewMessageToPage(name, message, messageNumber);
+            messageNumber++;
         }
 
         private string ParseMessage(string message)
@@ -70,7 +73,7 @@ namespace Prochat.Hubs
 
         private string Embed(string type, string data)
         {
-            return "<div id=\"embedType\">" + type + "<a id=\"embedToggle\"> Hide </a><br></div> <div id=\"embedData\">" + data + "</div>";
+            return "<div id=\"embedType\">" + type + "<a id=\"embedToggle" + messageNumber + "\"> Hide </a><br></div> <div id=\"embedData" + messageNumber + "\">" + data + "</div>";
         }
     }
 }
