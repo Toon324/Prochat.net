@@ -45,8 +45,9 @@ namespace Prochat.Hubs
         private string HandleYoutube(string message)
         {
             var data = message.Substring(message.IndexOf("youtu.be") + 9);
-            
-            message = "<div id=\"embedType\">Youtube Video: <a id=\"embedToggle\"> Hide </a><br></div><div id=\"embedData\"><embed width=\"420\" height=\"315\" src=\"http://www.youtube.com/v/" + data + "\"></div>"; 
+
+            message = Embed("Youtube Video ", "<embed width=\"420\" height=\"315\" src=\"http://www.youtube.com/v/" + data + "\">");
+            //message = "<div id=\"embedType\">Youtube Video: <a id=\"embedToggle\"> Hide </a><br></div><div id=\"embedData\"></div>"; 
             //message = "<div>Youtube Video: <br></div><embed src=\"http://www.youtube.com/v/zjnJk5V9nSM\">"; 
             
             //message = "Test";
@@ -57,6 +58,11 @@ namespace Prochat.Hubs
         {
 
             return message;
+        }
+
+        private string Embed(string type, string data)
+        {
+            return "<div id=\"embedType\">" + type + "<a id=\"embedToggle\"> Hide </a><br></div> <div id=\"embedData\">" + data + "</div>";
         }
     }
 }
