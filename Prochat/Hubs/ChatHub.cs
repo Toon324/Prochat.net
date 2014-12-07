@@ -25,7 +25,7 @@ namespace Prochat.Hubs
 
         private string ParseMessage(string message)
         {
-            if (message.Contains("youtu.be"))
+            if (message.Contains("youtu.be") || message.Contains("youtube.com/watch?"))
                 message = HandleYoutube(message);
             else if (message.Contains("http"))
                 message = HandleLink(message);
@@ -44,16 +44,24 @@ namespace Prochat.Hubs
 
         private string HandleYoutube(string message)
         {
-            var data = message.Substring(message.IndexOf("youtu.be") + 9);
+            string data;
+
+            //Ensure no passed in arguments
+            if (message.Contains("?"))
+                message = message.Substring(0, message.IndexOf("?"));
+
+            if (message.Contains("youtu.be"))
+                data = message.Substring(message.IndexOf("youtu.be") + 9);
+            else
+                data = message.Substring(message.IndexOf("?v=") + 3);
 
             message = Embed("Youtube Video ", "<embed width=\"420\" height=\"315\" src=\"http://www.youtube.com/v/" + data + "\">");
-            //message = "<div id=\"embedType\">Youtube Video: <a id=\"embedToggle\"> Hide </a><br></div><div id=\"embedData\"></div>"; 
-            //message = "<div>Youtube Video: <br></div><embed src=\"http://www.youtube.com/v/zjnJk5V9nSM\">"; 
-            
-            //message = "Test";
+   
             return message;
         }
 
+        
+        //template method
         private string HandleOther(string message)
         {
 
