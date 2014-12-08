@@ -39,8 +39,7 @@ namespace Prochat.Hubs
                 Send("Prochat", "Images such as png, jpg, and gif are all embedded as well. All embeded objects can be hidden and shown using the link found in the message.");
                 Send("Prochat", "http://i.imgur.com/p49J3rc.gif");
 
-                Send("Prochat", "Other links will simply be linked in the message");
-                Send("Prochat", "http://www.google.com");
+                Send("Prochat", "Other links will simply be linked in the message, like so: http://www.google.com");
                
                 
             }
@@ -56,7 +55,7 @@ namespace Prochat.Hubs
 
         private string HandleLink(string message)
         {
-            var url = message.Substring(message.IndexOf("http:"), message.IndexOf(".com")+4);
+            var url = Regex.Match(message, @"http\S*").ToString();
             var wrapped = "<a target=\"_blank\" href=\"" + url + "\" >" + url + "</a>";
 
             message = message.Replace(url, wrapped);
@@ -67,25 +66,25 @@ namespace Prochat.Hubs
         {
             string data;
 
-            //Ensure no passed in arguments
-            if (message.Contains("?"))
-                message = message.Substring(0, message.IndexOf("?"));
-
             if (message.Contains("youtu.be"))
-                data = message.Substring(message.IndexOf("youtu.be") + 9);
+                data = message.Substring(message.IndexOf("youtu.be/") + 9);
             else
-                data = message.Substring(message.IndexOf("v=") + 2);
+                data = Regex.Match(message, @"v=\S*").ToString().Replace("v=","");
 
-            message = Embed("Youtube Video ", "<embed width=\"420\" height=\"315\" src=\"http://www.youtube.com/v/" + data + "\">");
+            //Ensure no values are passed in
+            if (data.Contains("?"))
+                data = data.Substring(0, data.IndexOf("?"));
+
+            message = Embed("Youtube Video", "<embed width=\"420\" height=\"315\" src=\"http://www.youtube.com/v/" + data + "\">");
    
             return message;
         }
 
         private string HandleImage(string message)
         {
-            var url = Regex.Match(message, @"http://.+\..../.+\....").ToString();
+            var url = Regex.Match(message, @"http\S*").ToString();
             var embedded = "<img src=\"" + url + "\" style=\"width: 400px; height:300px\">";
-            message = message.Replace(url, Embed("Image ", embedded));
+            message = message.Replace(url, Embed("Image", embedded));
 
             return message;
         }
@@ -100,7 +99,7 @@ namespace Prochat.Hubs
 
         private string Embed(string type, string data)
         {
-            return "<div id=\"embedType\">" + type + "<a id=\"embedToggle" + messageNumber + "\"> Hide </a><br></div> <div id=\"embedData" + messageNumber + "\">" + data + "</div>";
+            return "<div id=\"embedType\">" + type + " " + "<a id=\"embedToggle" + messageNumber + "\"> Hide </a><br></div> <div id=\"embedData" + messageNumber + "\">" + data + "</div>";
         }
     }
 }
