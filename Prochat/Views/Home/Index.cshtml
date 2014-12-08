@@ -41,7 +41,7 @@
         // Create a function that the hub can call back to display messages.
         chat.client.addNewMessageToPage = function (name, message, messageNumber) {
             // Add the message to the page.
-            $('#discussion').append('<div><strong>' + htmlEncode(name) + messageNumber
+            $('#discussion').append('<div><strong>' + htmlEncode(name + "    " + messageNumber)
                  + '</strong>' + htmlEncode(message) + '<hr></div>');
             var elem = document.getElementById('discussion');
             elem.scrollTop = elem.scrollHeight;
