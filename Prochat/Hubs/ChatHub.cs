@@ -45,6 +45,8 @@ namespace Prochat.Hubs
             }
             else if (message.Contains("youtu.be") || message.Contains("youtube.com/watch?"))
                 message = HandleYoutube(message);
+            else if (message.Contains("twitch.tv"))
+                message = HandleTwitch(message);
             else if (message.Contains(".png") || message.Contains(".jpg") || message.Contains(".gif"))
                 message = HandleImage(message);
             else if (message.Contains("http"))
@@ -88,8 +90,16 @@ namespace Prochat.Hubs
 
             return message;
         }
-
+       // <iframe src="http://www.twitch.tv/tsm_bjergsen/embed" frameborder="0" scrolling="no" height="378" width="620"></iframe>
         
+        private string HandleTwitch(string message)
+        {
+            var data = Regex.Match(message, @"tv/\S*").ToString().Replace("tv/", "");
+
+            message = Embed("Twitch Stream", "<iframe src=\"http://www.twitch.tv/" + data  + "/embed\" frameborder=\"0\" scrolling=\"no\" height=\"315\" width=\"420\"");
+            return message;
+        }
+
         //template method
         private string HandleOther(string message)
         {
