@@ -10,12 +10,7 @@ namespace Prochat.Controllers
     {
         public ActionResult Index()
         {
-            var username = Session["Username"] as string;
-            if (username == null)
-                username = "Default";
-
-            var user = new User { UserName = username };
-            return View(user);
+            return RedirectToAction("index", "chat");
         }
 
         public ActionResult About()

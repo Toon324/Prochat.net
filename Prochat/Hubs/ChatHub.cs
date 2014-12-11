@@ -32,7 +32,7 @@ namespace Prochat.Hubs
             if (message.Equals("Prochat, show me your features"))
             {
                 Send("Prochat", "Hello, and welcome to Prochat! Here are the current awesome features you can enjoy:");
-                
+
                 Send("Prochat", "You can also paste most Youtube video links and have them automagically embed. If a video isn't working, try using the link found in the \"Share\" tab on the video page.");
                 Send("Prochat", "http://youtu.be/SQoA_wjmE9w");
 
@@ -40,13 +40,15 @@ namespace Prochat.Hubs
                 Send("Prochat", "http://i.imgur.com/p49J3rc.gif");
 
                 Send("Prochat", "Other links will simply be linked in the message, like so: http://www.google.com");
-               
-                
+
+
             }
             else if (message.Contains("youtu.be") || message.Contains("youtube.com/watch?"))
                 message = HandleYoutube(message);
             else if (message.Contains("twitch.tv"))
                 message = HandleTwitch(message);
+            else if (message.Contains("Google Hangout"))
+                message = HandleHangout(message);
             else if (message.Contains(".png") || message.Contains(".jpg") || message.Contains(".gif"))
                 message = HandleImage(message);
             else if (message.Contains("http"))
@@ -98,6 +100,14 @@ namespace Prochat.Hubs
 
             message = Embed("Twitch Stream", "<iframe src=\"http://www.twitch.tv/" + data  + "/embed\" frameborder=\"0\" scrolling=\"no\" height=\"315\" width=\"420\"");
             return message;
+        }
+
+        
+
+        private string HandleHangout(string message)
+        {
+
+            return "<div id=\"placeholder-div1\"></div><script>gapi.hangout.render('placeholder-div1', {'render': 'createhangout','initial_apps': [{'app_id' : '184219133185', 'start_data' : 'dQw4w9WgXcQ', 'app_type' : 'ROOM_APP' }]});</script>";
         }
 
         //template method
