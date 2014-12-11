@@ -20,10 +20,15 @@ namespace Prochat.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (model.Username == "test")
+                if (DataAccess.UserDatabaseConnector.UserIsValid(model.Username, model.Password))
                 {
                     FormsAuthentication.SetAuthCookie(model.Username, false);
+                    Session["Username"] = model.Username;
+
                     return RedirectToAction("index", "chat");
+                }
+                {
+                    ModelState.AddModelError("", "Invalid Username or Password.");
                 }
             }
             return View();

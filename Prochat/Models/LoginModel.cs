@@ -9,6 +9,7 @@ namespace Prochat.Controllers
     public class LoginModel
     {
         [Required]
+        [MinLength(3)]
         public string Username { get; set; }
 
         [Required]
