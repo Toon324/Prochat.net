@@ -13,13 +13,54 @@ namespace Prochat.Hubs
     public class ChatHub : Hub
     {
         private static int messageNumber = 0;
+        private string roomName = "default";
 
         public void Hello()
         {
             Clients.All.hello();
         }
 
+        public void History()
+        {
+           var history = DataAccess.ChatHistoryDatabaseConnector.GetHistory(roomName);
+
+           string user = "";
+
+
+           foreach (string s in history)
+           {
+               //Simple parser that loads a username first then prints the message second, due to the fact the SQL connector currently returns everything as a 1-dimensional list.
+               if (user.Equals(""))
+                   user = s;
+               else
+               {
+                   HandleMessage(user, s);
+                   user = "";
+               }
+               
+           }
+            
+
+          /*
+            for (int i = 0; i < history.Length; i++)
+           {
+                  HandleMessage("History", history[i]);
+ 
+           }
+           */
+           
+          // HandleMessage("Output", history);
+        }
+
         public void Send(string name, string message)
+        {
+            // Save to history
+            DataAccess.ChatHistoryDatabaseConnector.AddToHistory(roomName, name, message);
+
+            HandleMessage(name, message);
+        }
+
+        private void HandleMessage(string name, string message)
         {
             // Call the addNewMessageToPage method to update clients.
             message = ParseMessage(message);
@@ -43,6 +84,8 @@ namespace Prochat.Hubs
 
 
             }
+            else if (message.Equals("history"))
+                History();
             else if (message.Contains("youtu.be") || message.Contains("youtube.com/watch?"))
                 message = HandleYoutube(message);
             else if (message.Contains("twitch.tv"))
@@ -102,12 +145,10 @@ namespace Prochat.Hubs
             return message;
         }
 
-        
-
         private string HandleHangout(string message)
         {
 
-            return "<div id=\"placeholder-div1\"></div><script>gapi.hangout.render('placeholder-div1', {'render': 'createhangout','initial_apps': [{'app_id' : '184219133185', 'start_data' : 'dQw4w9WgXcQ', 'app_type' : 'ROOM_APP' }]});</script>";
+            return "<iframe width=\"80%\" height=\"100\" scrolling=\"no\" frameborder=\"no\" src=\"https://w.soundcloud.com/player/?visual=true&url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F157576919&show_artwork=true\"></iframe>";
         }
 
         //template method

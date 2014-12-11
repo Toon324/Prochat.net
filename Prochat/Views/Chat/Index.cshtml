@@ -4,7 +4,7 @@
 }
 <div class="container">
     <div id="discussion"></div>
-    <input type="text" id="message" />
+    <textarea id="message"></textarea>
     <input type="button" id="sendmessage" value="Send" />
     <input type="hidden" id="displayname" />
     
@@ -13,15 +13,21 @@
 <style>
     .container {
         height: auto;
+        max-width: 1200px;
     }
 
     #message {
         width: 100%;
+        max-width: 1000px;
     }
 
     #discussion {
-        height: 900px;
+        height: 880px;
         overflow: scroll;
+    }
+
+    body {
+        background-color: #D7D7D7;
     }
 
    
@@ -45,12 +51,10 @@
 
         var chat = $.connection.ChatHub;
 
-
-
         // Create a function that the hub can call back to display messages.
         chat.client.addNewMessageToPage = function (name, message, messageNumber) {
             // Add the message to the page.
-            $('#discussion').append('<div><strong>' + htmlEncode(name + "    " + messageNumber)
+            $('#discussion').append('<div class="strangerMessage" id="' + name + messageNumber + '"><strong>' + htmlEncode(name + "    " + messageNumber)
                  + '</strong>' + htmlEncode(message) + '<hr></div>');
             var elem = document.getElementById('discussion');
             elem.scrollTop = elem.scrollHeight;
@@ -73,7 +77,6 @@
 
 
         if (username == "Default") {
- 
             var entered = prompt("What would you like your username to be?: ", "Tester" + Math.round(Math.random() * 1000));
             '@Model.UserName = entered';
             username = entered;
@@ -90,6 +93,7 @@
 
             // Start the connection.
             $.connection.hub.start().done(function () {
+                chat.server.history();
                 $('#sendmessage').click(function () {
 
                     sendMessage(chat);
