@@ -2,18 +2,49 @@
 @{
     ViewBag.Title = "ProChat";
 }
-<div class="container">
-    <div id="discussion"></div>
-    <textarea id="message"></textarea>
-    <input type="button" id="sendmessage" value="Send" />
-    <input type="hidden" id="displayname" />
-    
+<div class="fullContainer">
+
+    <div class="leftRail">
+        <h2>Chat controls</h2>
+        <br /><br />
+        <audio controls autoplay></audio>
+    </div>
+
+    <div class="chatContainer">
+        <div id="discussion"></div>
+        <textarea id="message"></textarea>
+        <input type="button" id="sendmessage" value="Send" />
+        <input type="hidden" id="displayname" />
+
+    </div>
+
+    <div class="rightRail">
+
+    </div>
+
+
 </div>
+
+
 
 <style>
     .container {
-        height: auto;
-        max-width: 1200px;
+        max-width: 100%;
+    }
+
+    .rightRail {
+        float: right;
+        width: 20%;
+    }
+
+    .leftRail {
+        float: left;
+        width: 20%;
+    }
+
+    .chatContainer {
+        width: 60%;
+        display: inline-block;
     }
 
     #message {
@@ -126,5 +157,52 @@
             var encodedValue = "<div>" + value + "</div>";
             return encodedValue;
         }
+
+
+        var audio = window.audio = document.querySelector('audio');
+        var constraints = window.constraints = {
+            audio: true,
+            video: false
+        };
+
+        navigator.getUserMedia = navigator.getUserMedia ||
+          navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+        function successCallback(stream) {
+            var videoTracks = stream.getVideoTracks();
+            var audioTracks = stream.getAudioTracks();
+            if (audioTracks.length === 1 && videoTracks.length === 0) {
+                console.log('Got stream with constraints:', constraints);
+                console.log('Using audio device: ' + audioTracks[0].label);
+                stream.onended = function () {
+                    console.log('Stream ended');
+                };
+            }
+            window.stream = stream; // make variable available to browser console
+            if (window.URL) {
+                audio.src = window.URL.createObjectURL(stream);
+            } else {
+                audio.src = stream;
+            }
+            /*
+            //Connect the media to RTC
+            var connection = new RTCPeerConnection(null);
+            connection.addStream(stream);
+
+            //Create offer
+            connection.createOffer(function (desc) {
+                connection.setLocalDescription(desc, function () {
+                    //Send to peer
+                    $.connection.hub.server.send(JSON.stringify({ "sdp": desc })); //SignalR call
+                });
+            });
+            */
+        }
+
+        function errorCallback(error) {
+            console.log('navigator.getUserMedia error: ', error);
+        }
+
+        navigator.getUserMedia(constraints, successCallback, errorCallback);
     </script>
 }

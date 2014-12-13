@@ -18,6 +18,10 @@ namespace Prochat.Controllers
             return View(user);
         }
 
+        public ActionResult Call()
+        {
+            return Call();
+        }
   
     }
 }

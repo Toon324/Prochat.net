@@ -18,13 +18,6 @@ namespace Prochat.DataAccess
 
             connection.Open();
             var reader = cmd.ExecuteReader();
-
-            
-            /*
-            string[] output = new string[reader.FieldCount];
-            reader.Read();
-            reader.GetValues(output);
-            */
   
             List<string> output = new List<string>();
 

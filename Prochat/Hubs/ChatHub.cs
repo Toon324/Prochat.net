@@ -4,6 +4,9 @@ using System.Web;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using System.Linq;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
 
 
 
@@ -22,10 +25,10 @@ namespace Prochat.Hubs
 
         public void History()
         {
+            /*
            var history = DataAccess.ChatHistoryDatabaseConnector.GetHistory(roomName);
 
            string user = "";
-
 
            foreach (string s in history)
            {
@@ -39,29 +42,22 @@ namespace Prochat.Hubs
                }
                
            }
-            
-
-          /*
-            for (int i = 0; i < history.Length; i++)
-           {
-                  HandleMessage("History", history[i]);
- 
-           }
-           */
-           
-          // HandleMessage("Output", history);
+          */
         }
 
         public void Send(string name, string message)
         {
             // Save to history
-            DataAccess.ChatHistoryDatabaseConnector.AddToHistory(roomName, name, message);
+            //DataAccess.ChatHistoryDatabaseConnector.AddToHistory(roomName, name, message);
 
             HandleMessage(name, message);
         }
 
         private void HandleMessage(string name, string message)
         {
+            if (message.Equals(""))
+                return; //Don't handle an empty message
+
             // Call the addNewMessageToPage method to update clients.
             message = ParseMessage(message);
             Clients.All.addNewMessageToPage(name, message, messageNumber);
@@ -84,14 +80,12 @@ namespace Prochat.Hubs
 
 
             }
-            else if (message.Equals("history"))
-                History();
             else if (message.Contains("youtu.be") || message.Contains("youtube.com/watch?"))
                 message = HandleYoutube(message);
             else if (message.Contains("twitch.tv"))
                 message = HandleTwitch(message);
-            else if (message.Contains("Google Hangout"))
-                message = HandleHangout(message);
+            else if (message.Contains("soundcloud.com") && !message.Contains("oembed"))
+                message = HandleSoundcloud(message);
             else if (message.Contains(".png") || message.Contains(".jpg") || message.Contains(".gif"))
                 message = HandleImage(message);
             else if (message.Contains("http"))
@@ -145,10 +139,40 @@ namespace Prochat.Hubs
             return message;
         }
 
-        private string HandleHangout(string message)
+        private string HandleSoundcloud(string message)
         {
+            var data = Regex.Match(message, @"http\S*soundcloud.com/\S*").ToString();
+            HttpWebRequest request = (HttpWebRequest)
+                             WebRequest.Create("http://soundcloud.com/oembed?url=" + data);
 
-            return "<iframe width=\"80%\" height=\"100\" scrolling=\"no\" frameborder=\"no\" src=\"https://w.soundcloud.com/player/?visual=true&url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F157576919&show_artwork=true\"></iframe>";
+
+            var response = request.GetResponse() as HttpWebResponse;
+            //var response = WebAccess.Requests.SendWebRequest("http://soundcloud.com/oembed?url=" + data);
+    
+            var reader = new StreamReader(response.GetResponseStream());
+
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+
+
+            var s = reader.ReadLine();
+
+            var src = Regex.Match(s, @"https.*").ToString();
+            return Embed("Soundcloud","<iframe width=\"80%\" height=\"120\" scrolling=\"no\" frameborder=\"no\" src=" + src + "></iframe>");
+        }
+
+        private void Debug(string msg)
+        {
+            Clients.All.addNewMessageToPage("Prochat Debugger", msg);
         }
 
         //template method
