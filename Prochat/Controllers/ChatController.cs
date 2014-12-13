@@ -12,7 +12,7 @@ namespace Prochat.Controllers
         {
             var username = Session["Username"] as string;
             if (username == null)
-                username = "Default";
+                return RedirectToAction("proceedToLogin", "logout");
 
             var user = new User { UserName = username };
             return View(user);

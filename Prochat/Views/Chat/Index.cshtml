@@ -7,7 +7,10 @@
     <div class="leftRail">
         <h2>Chat controls</h2>
         <br /><br />
-        <audio controls autoplay></audio>
+        <video id="stream" width = "300" height="200"autoplay></video>
+        <br /><br />
+        <input id ="callId" type="text" value="">
+        <button id="callButton">Call</button>
     </div>
 
     <div class="chatContainer">
@@ -32,6 +35,10 @@
         max-width: 100%;
     }
 
+    .video {
+        object-fit: fill;
+    }
+
     .rightRail {
         float: right;
         width: 20%;
@@ -47,14 +54,14 @@
         display: inline-block;
     }
 
-    #message {
-        width: 100%;
-        max-width: 1000px;
+    #discussion {
+        overflow: scroll;
+        
+        height: 90vh;
     }
 
-    #discussion {
-        height: 880px;
-        overflow: scroll;
+    #message {
+        width: 90%;
     }
 
     body {
@@ -73,6 +80,8 @@
     <script src="~/signalr/hubs"></script>
     <!--SignalR script to update the chat page and send messages.-->
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!--Used for calls-->
+    <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
     <script type="text/javascript">
 
 
@@ -158,51 +167,49 @@
             return encodedValue;
         }
 
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-        var audio = window.audio = document.querySelector('audio');
-        var constraints = window.constraints = {
-            audio: true,
-            video: false
-        };
+        var peer = new Peer('@Model.UserName', { key: '2kkgyhe7ky6z85mi' });
+        console.log("registered with peer name of @Model.UserName");
 
-        navigator.getUserMedia = navigator.getUserMedia ||
-          navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        $('#callButton').click(function () {
+            console.log("Call initiated.");
+            console.log("Calling " + $('#callId').text());
 
-        function successCallback(stream) {
-            var videoTracks = stream.getVideoTracks();
-            var audioTracks = stream.getAudioTracks();
-            if (audioTracks.length === 1 && videoTracks.length === 0) {
-                console.log('Got stream with constraints:', constraints);
-                console.log('Using audio device: ' + audioTracks[0].label);
-                stream.onended = function () {
-                    console.log('Stream ended');
-                };
-            }
-            window.stream = stream; // make variable available to browser console
-            if (window.URL) {
-                audio.src = window.URL.createObjectURL(stream);
-            } else {
-                audio.src = stream;
-            }
-            /*
-            //Connect the media to RTC
-            var connection = new RTCPeerConnection(null);
-            connection.addStream(stream);
-
-            //Create offer
-            connection.createOffer(function (desc) {
-                connection.setLocalDescription(desc, function () {
-                    //Send to peer
-                    $.connection.hub.server.send(JSON.stringify({ "sdp": desc })); //SignalR call
+            navigator.getUserMedia({ video: true, audio: true }, function (stream) {
+                var call = peer.call('Toon', stream);
+                call.on('stream', function (remoteStream) {
+                    var video = document.querySelector('video');
+                    window.stream = remoteStream; // stream available to console
+                    if (window.URL) {
+                        video.src = window.URL.createObjectURL(remoteStream);
+                    } else {
+                        video.src = remoteStream;
+                    }
                 });
+            }, function (err) {
+                console.log('Failed to get local stream', err);
             });
-            */
-        }
+        });
 
-        function errorCallback(error) {
-            console.log('navigator.getUserMedia error: ', error);
-        }
-
-        navigator.getUserMedia(constraints, successCallback, errorCallback);
+        
+        peer.on('call', function (call) {
+            console.log("Incoming call ");
+            navigator.getUserMedia({ video: true, audio: true }, function (stream) {
+                call.answer(stream); // Answer the call with an A/V stream.
+                call.on('stream', function (remoteStream) {
+                    var video = document.querySelector('video');
+                    window.stream = remoteStream; // stream available to console
+                    if (window.URL) {
+                        video.src = window.URL.createObjectURL(remoteStream);
+                    } else {
+                        video.src = remoteStream;
+                    }
+                });
+            }, function (err) {
+                console.log('Failed to get local stream', err);
+            });
+        });
+        
     </script>
 }

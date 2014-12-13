@@ -15,5 +15,11 @@ namespace Prochat.Controllers
             FormsAuthentication.SignOut();
             return View();
         }
+
+        public ActionResult ProceedToLogin()
+        {
+            FormsAuthentication.SignOut();
+            return RedirectToAction("index", "login");
+        }
     }
 }
