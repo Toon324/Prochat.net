@@ -1,0 +1,154 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
+
+namespace Prochat.Services
+{
+    public class MessageHandler
+    {
+
+        public static string HandleMessage(string message)
+        {
+            
+            if (message.Contains("/r/"))
+                message = HandleReddit(message);
+            else if (message.Contains("youtu.be") || message.Contains("youtube.com/watch?"))
+                message = HandleYoutube(message);
+            else if (message.Contains("twitch.tv"))
+                message = HandleTwitch(message);
+            else if (message.Contains("soundcloud.com") && !message.Contains("oembed"))
+                message = HandleSoundcloud(message);
+            else if (message.Contains(".png") || message.Contains(".jpg") || message.Contains(".gif"))
+                message = HandleImage(message);
+            else if (message.Contains("http"))
+                message = HandleLink(message);
+
+            return message;
+        }
+
+        private static string HandleLink(string message)
+        {
+            var url = Regex.Match(message, @"http\S*").ToString();
+            var wrapped = "<a target=\"_blank\" href=\"" + url + "\" >" + url + "</a>";
+
+            message = message.Replace(url, wrapped);
+            return message;
+        }
+
+        private static string HandleYoutube(string message)
+        {
+            string data;
+
+            if (message.Contains("youtu.be"))
+                data = message.Substring(message.IndexOf("youtu.be/") + 9);
+            else
+                data = Regex.Match(message, @"v=\S*").ToString().Replace("v=", "");
+
+            //Ensure no values are passed in
+            if (data.Contains("?"))
+                data = data.Substring(0, data.IndexOf("?"));
+
+            message = Embed("Youtube Video", "<embed width=\"420\" height=\"315\" src=\"http://www.youtube.com/v/" + data + "\">");
+
+            return message;
+        }
+
+        private static string HandleImage(string message)
+        {
+            var url = Regex.Match(message, @"http\S*").ToString();
+            var embedded = "<img src=\"" + url + "\" style=\"width: 400px; height:300px\">";
+            message = message.Replace(url, Embed("Image", embedded));
+
+            return message;
+        }
+        // <iframe src="http://www.twitch.tv/tsm_bjergsen/embed" frameborder="0" scrolling="no" height="378" width="620"></iframe>
+
+        private static string HandleTwitch(string message)
+        {
+            var data = Regex.Match(message, @"tv/\S*").ToString().Replace("tv/", "");
+
+            message = Embed("Twitch Stream", "<iframe src=\"http://www.twitch.tv/" + data + "/embed\" frameborder=\"0\" scrolling=\"no\" height=\"315\" width=\"420\"");
+            return message;
+        }
+
+        private static string HandleSoundcloud(string message)
+        {
+            var data = Regex.Match(message, @"http\S*soundcloud.com/\S*").ToString();
+
+            /*
+            HttpWebRequest request = (HttpWebRequest)
+                             WebRequest.Create("http://soundcloud.com/oembed?url=" + data);
+
+
+            var response = request.GetResponse() as HttpWebResponse;
+            */
+
+            var response = WebAccess.Requests.SendWebRequest("http://soundcloud.com/oembed?url=" + data);
+
+            var reader = new StreamReader(response.GetResponseStream());
+
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+            reader.ReadLine();
+
+
+            var s = reader.ReadLine();
+
+            var src = Regex.Match(s, @"https.*").ToString();
+            return Embed("Soundcloud", "<iframe width=\"80%\" height=\"120\" scrolling=\"no\" frameborder=\"no\" src=" + src + "></iframe>");
+        }
+
+        private static string HandleCommandIFrame(string message)
+        {
+            var url = Regex.Match(message, @"http\S*").ToString();
+
+            return Embed(message, WrapWithIFrame(url));
+        }
+
+        private static string HandleReddit(string message)
+        {
+            var sub = Regex.Match(message, @"/r/\S*").ToString();
+            var url = "https://www.reddit.com" + sub;
+            message = message.Replace(sub, WrapWithURL(url, sub));
+            return message;
+        }
+
+        //template method
+        private static string HandleOther(string message)
+        {
+
+            return message;
+        }
+
+        private static string Embed(string type, string data)
+        {
+            return "<div id=\"embedType\">" + type + " " + "<a id=\"embedToggle" + Hubs.ChatHub.messageNumber + "\"> Hide </a><br></div> <div id=\"embedData" + Hubs.ChatHub.messageNumber + "\">" + data + "</div>";
+        }
+
+        private static string WrapWithIFrame(string url)
+        {
+            return WrapWithIFrame(url, 420, 315);
+        }
+
+        private static string WrapWithIFrame(string url, int width, int height)
+        {
+            return "<iframe width=\"" + width + "\" height=\"" + height + "\" scrolling=\"yes\" frameborder=\"no\" src=" + url + "></iframe>";
+        }
+
+        private static string WrapWithURL(string url, string text)
+        {
+            return "<a target=\"_blank\" href=\"" + url + "\" >" + text + "</a>";
+        }
+    }
+}

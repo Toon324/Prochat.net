@@ -16,3 +16,126 @@
     white-space: normal;
 }
 
+.container {
+        max-width: 100%;
+    }
+
+    .video {
+        object-fit: fill;
+    }
+
+    .rightRail {
+        float: right;
+        width: 20%;
+    }
+
+    .leftRail {
+        float: left;
+        width: 20%;
+    }
+
+    .chatContainer {
+        width: 60%;
+        display: inline-block;
+    }
+
+    #discussion {
+        overflow: scroll;
+        
+        height: 90vh;
+    }
+
+    .strangerMessage {
+        /* Full credit for gradient code goes to www.css3factory.com/linear-gradients/ */
+    background-image: -webkit-gradient(
+	linear,
+	left top,
+	left bottom,
+	color-stop(0, #CFCFCF),
+	color-stop(1, #EBEBEB)
+);
+background-image: -o-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
+background-image: -moz-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
+background-image: -webkit-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
+background-image: -ms-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
+background-image: linear-gradient(to bottom, #CFCFCF 0%, #EBEBEB 100%);
+    }
+
+    #message {
+        width: 90%;
+    }
+
+    body {
+        background-color: #D7D7D7;
+    }
+
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen 
+and (min-device-width : 320px) 
+and (max-device-width : 480px) {
+    .leftRail {
+        display: none;
+    }
+    .rightRail {
+        display: none;
+    }
+    .chatContainer {
+        width: 100%;
+    }
+    #discussion {
+        height: 80vh;
+    }
+    #message {
+        width: 80%;
+        height: 30px;
+    }
+}
+
+
+
+
+/* iPads (portrait) ----------- */
+@media only screen 
+and (min-device-width : 768px) 
+and (max-device-width : 1024px) 
+and (orientation : portrait) {
+.leftRail {
+        display: none;
+    }
+    .rightRail {
+        display: none;
+    }
+    .chatContainer {
+        width: 100%;
+    }
+    #discussion {
+        height: 80vh;
+    }
+    #message {
+        width: 80%;
+        height: 30px;
+    }
+}
+
+
+/* iPhone 4 ----------- */
+@media
+only screen and (-webkit-min-device-pixel-ratio : 1.5),
+only screen and (min-device-pixel-ratio : 1.5) {
+.leftRail {
+        display: none;
+    }
+    .rightRail {
+        display: none;
+    }
+    .chatContainer {
+        width: 100%;
+    }
+    #discussion {
+        height: 80vh;
+    }
+    #message {
+        width: 80%;
+        height: 30px;
+    }
+}

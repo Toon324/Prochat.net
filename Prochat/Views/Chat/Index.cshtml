@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "ProChat";
 }
+
 <div class="fullContainer">
 
     <div class="leftRail">
@@ -9,6 +10,7 @@
         <br /><br />
         <video id="stream" width = "300" height="200"autoplay></video>
         <br /><br />
+        <div id="roomUsers"><h3>Users in room</h3><hr></div>
         <input id ="callId" type="text" value="">
         <button id="callButton">Call</button>
     </div>
@@ -30,47 +32,6 @@
 
 
 
-<style>
-    .container {
-        max-width: 100%;
-    }
-
-    .video {
-        object-fit: fill;
-    }
-
-    .rightRail {
-        float: right;
-        width: 20%;
-    }
-
-    .leftRail {
-        float: left;
-        width: 20%;
-    }
-
-    .chatContainer {
-        width: 60%;
-        display: inline-block;
-    }
-
-    #discussion {
-        overflow: scroll;
-        
-        height: 90vh;
-    }
-
-    #message {
-        width: 90%;
-    }
-
-    body {
-        background-color: #D7D7D7;
-    }
-
-   
-</style>
-
 @section scripts {
     <!--Script references. -->
     <!--The jQuery library is required and is referenced by default in _Layout.cshtml. -->
@@ -82,8 +43,8 @@
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <!--Used for calls-->
     <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
-    <script type="text/javascript">
 
+    <script type="text/javascript">
 
     $(function () {
         // Reference the auto-generated proxy for the hub.
@@ -95,7 +56,7 @@
         chat.client.addNewMessageToPage = function (name, message, messageNumber) {
             // Add the message to the page.
             $('#discussion').append('<div class="strangerMessage" id="' + name + messageNumber + '"><strong>' + htmlEncode(name + "    " + messageNumber)
-                 + '</strong>' + htmlEncode(message) + '<hr></div>');
+                 + '</strong>' + htmlEncode(message) + '</div>');
             var elem = document.getElementById('discussion');
             elem.scrollTop = elem.scrollHeight;
 
@@ -109,7 +70,7 @@
                     $('#embedData' + messageNumber).show();
                     $('#embedToggle' + messageNumber).text("Hide");
                 }
-                
+
             });
         };
 
@@ -120,96 +81,129 @@
             var entered = prompt("What would you like your username to be?: ", "Tester" + Math.round(Math.random() * 1000));
             '@Model.UserName = entered';
             username = entered;
-            }
+        }
 
 
-            $('#displayname').val(username);
+        $('#displayname').val(username);
 
 
-            // Set initial focus to message input box.
-            $('#message').focus();
+        // Set initial focus to message input box.
+        $('#message').focus();
 
-            $('#message').keypress(keypressHandler);
+        $('#message').keypress(keypressHandler);
 
-            // Start the connection.
-            $.connection.hub.start().done(function () {
-                chat.server.history();
-                $('#sendmessage').click(function () {
-
-                    sendMessage(chat);
-                });
-
-
-            });
+        $(window).unload(function () {
+            alert('Thanks for chatting!');
+            chat.server.leave('@Model.UserName');
         });
 
-        function keypressHandler(e) {
-            if (e.which == 13) {
-                $('#sendmessage').blur();
-                var chat = $.connection.ChatHub;
+
+
+        // Start the connection.
+        $.connection.hub.start().done(function () {
+            chat.server.history();
+            chat.server.join('@Model.UserName');
+
+            //chat.server.getConnectedUsers();
+            //console.log('Joined room as @Model.UserName');
+            $('#sendmessage').click(function () {
+
                 sendMessage(chat);
-            }
-        }
-
-        function sendMessage(chat) {
-
-            // Call the Send method on the hub.
-            chat.server.send($('#displayname').val(), $('#message').val());
-            // Clear text box and reset focus for next comment.
-            $('#message').val('').focus();
-
-        }
-
-        // This optional function html-encodes messages for display in the page.
-        function htmlEncode(value) {
-            //var encodedValue = $('<div />').text(value).html();
-            var encodedValue = "<div>" + value + "</div>";
-            return encodedValue;
-        }
-
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-        var peer = new Peer('@Model.UserName', { key: '2kkgyhe7ky6z85mi' });
-        console.log("registered with peer name of @Model.UserName");
-
-        $('#callButton').click(function () {
-            console.log("Call initiated.");
-            console.log("Calling " + $('#callId').text());
-
-            navigator.getUserMedia({ video: true, audio: true }, function (stream) {
-                var call = peer.call('Toon', stream);
-                call.on('stream', function (remoteStream) {
-                    var video = document.querySelector('video');
-                    window.stream = remoteStream; // stream available to console
-                    if (window.URL) {
-                        video.src = window.URL.createObjectURL(remoteStream);
-                    } else {
-                        video.src = remoteStream;
-                    }
-                });
-            }, function (err) {
-                console.log('Failed to get local stream', err);
             });
+
+
         });
 
-        
-        peer.on('call', function (call) {
-            console.log("Incoming call ");
-            navigator.getUserMedia({ video: true, audio: true }, function (stream) {
-                call.answer(stream); // Answer the call with an A/V stream.
-                call.on('stream', function (remoteStream) {
-                    var video = document.querySelector('video');
-                    window.stream = remoteStream; // stream available to console
-                    if (window.URL) {
-                        video.src = window.URL.createObjectURL(remoteStream);
-                    } else {
-                        video.src = remoteStream;
-                    }
-                });
-            }, function (err) {
-                console.log('Failed to get local stream', err);
+        chat.client.loadUsers = function (data) {
+            loadUsers(data);
+        };
+
+        chat.client.clearUsers = function (data) {
+            $('#roomUsers > h4').remove();
+        };
+
+    });
+
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+    var peer = new Peer('@Model.UserName', { key: '2kkgyhe7ky6z85mi' });
+    console.log("registered with peer name of @Model.UserName");
+
+    $('#callButton').click(function () {
+        console.log("Call initiated.");
+        console.log("Calling " + $('#callId').text());
+
+        navigator.getUserMedia({ video: true, audio: true }, function (stream) {
+            var call = peer.call('Toon', stream);
+            call.on('stream', function (remoteStream) {
+                var video = document.querySelector('video');
+                window.stream = remoteStream; // stream available to console
+                if (window.URL) {
+                    video.src = window.URL.createObjectURL(remoteStream);
+                } else {
+                    video.src = remoteStream;
+                }
             });
+        }, function (err) {
+            console.log('Failed to get local stream', err);
         });
-        
+    });
+
+
+    peer.on('call', function (call) {
+        console.log("Incoming call ");
+        navigator.getUserMedia({ video: true, audio: true }, function (stream) {
+            call.answer(stream); // Answer the call with an A/V stream.
+            call.on('stream', function (remoteStream) {
+                var video = document.querySelector('video');
+                window.stream = remoteStream; // stream available to console
+                if (window.URL) {
+                    video.src = window.URL.createObjectURL(remoteStream);
+                } else {
+                    video.src = remoteStream;
+                }
+            });
+        }, function (err) {
+            console.log('Failed to get local stream', err);
+        });
+    });
+
+
+    function keypressHandler(e) {
+        if (e.which == 13) {
+            $('#sendmessage').blur();
+            var chat = $.connection.ChatHub;
+            sendMessage(chat);
+        }
+    }
+
+    function sendMessage(chat) {
+
+        // Call the Send method on the hub.
+        chat.server.send($('#displayname').val(), $('#message').val());
+        // Clear text box and reset focus for next comment.
+        $('#message').val('').focus();
+
+    }
+
+    // This optional function html-encodes messages for display in the page.
+    function htmlEncode(value) {
+        //var encodedValue = $('<div />').text(value).html();
+        var encodedValue = "<div>" + value + "</div>";
+        return encodedValue;
+    }
+
+    function loadUsers(data) {
+        console.log("Adding user to room: " + data);
+        $('#roomUsers').append("<h4>" + data + "</h4>");
+
+    }
+
+    function unload() {
+        console.log("Unloading");
+        chat.server.leave('@Model.UserName');
+    }
+
+
     </script>
 }
