@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -16,5 +17,11 @@ namespace Prochat.WebAccess
             return request.GetResponse() as HttpWebResponse;
 
         }
+
+        public static StreamReader GetJsonReader(string requestUrl)
+        {
+            return new StreamReader(SendWebRequest(requestUrl).GetResponseStream());
+        }
+
     }
 }

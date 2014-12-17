@@ -124,9 +124,7 @@ namespace Prochat.Hubs
                 return Services.MessageHandler.HandleMessage(message);
         }
 
-        
-        //internal use only
-        private void Debug(string msg)
+        public void Debug(string msg)
         {
             Clients.All.addNewMessageToPage("Prochat Debugger", msg);
         }
