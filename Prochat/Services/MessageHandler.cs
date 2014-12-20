@@ -12,10 +12,10 @@ namespace Prochat.Services
 
         public static string HandleMessage(string message)
         {
-            if (Regex.Match(message, @"/gif").Success)
-                message = HandleGifCommand(message);
-            else if (message.Contains("/r/"))
+            if (message.Contains("/r/"))
                 message = HandleReddit(message);
+            else if (Regex.Match(message, @"/gif").Success)
+                message = HandleGifCommand(message);
             else if (message.Contains("youtu.be") || message.Contains("youtube.com/watch?"))
                 message = HandleYoutube(message);
             else if (message.Contains("twitch.tv"))

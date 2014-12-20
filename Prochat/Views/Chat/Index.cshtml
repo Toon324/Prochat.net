@@ -11,8 +11,6 @@
         <video id="stream" width = "300" height="200"autoplay></video>
         <br /><br />
         <div id="roomUsers"><h3>Users in room</h3><hr></div>
-        <input id ="callId" type="text" value="">
-        <button id="callButton">Call</button>
     </div>
 
     <div class="chatContainer">
@@ -20,7 +18,6 @@
         <textarea id="message"></textarea>
         <input type="button" id="sendmessage" value="Send" />
         <input type="hidden" id="displayname" />
-
     </div>
 
     <div class="rightRail">
@@ -45,7 +42,7 @@
     <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
 
     <script type="text/javascript">
-
+        var focus = true;
     $(function () {
         // Reference the auto-generated proxy for the hub.
 
@@ -55,10 +52,12 @@
         // Create a function that the hub can call back to display messages.
         chat.client.addNewMessageToPage = function (name, message, messageNumber) {
             // Add the message to the page.
-            $('#discussion').append('<div class="strangerMessage" id="' + name + messageNumber + '"><strong>' + htmlEncode(name + "    " + messageNumber)
+            $('#discussion').append('<div class="strangerMessage" id="' + name + messageNumber + '"><strong>' + htmlEncode(name)
                  + '</strong>' + htmlEncode(message) + '</div>');
             var elem = document.getElementById('discussion');
             elem.scrollTop = elem.scrollHeight;
+
+            PlaySound();
 
             $('#embedToggle' + messageNumber).click(function (e) {
                 if ($('#embedToggle' + messageNumber).text() == "Hide") {
@@ -97,6 +96,13 @@
             chat.server.leave('@Model.UserName');
         });
 
+        $(window).focus(function () {
+            focus = true;
+        });
+
+        $(window).blur(function () {
+            focus = false;
+        });
 
 
         // Start the connection.
@@ -129,25 +135,7 @@
     var peer = new Peer('@Model.UserName', { key: '2kkgyhe7ky6z85mi' });
     console.log("registered with peer name of @Model.UserName");
 
-    $('#callButton').click(function () {
-        console.log("Call initiated.");
-        console.log("Calling " + $('#callId').text());
-
-        navigator.getUserMedia({ video: true, audio: true }, function (stream) {
-            var call = peer.call('Toon', stream);
-            call.on('stream', function (remoteStream) {
-                var video = document.querySelector('video');
-                window.stream = remoteStream; // stream available to console
-                if (window.URL) {
-                    video.src = window.URL.createObjectURL(remoteStream);
-                } else {
-                    video.src = remoteStream;
-                }
-            });
-        }, function (err) {
-            console.log('Failed to get local stream', err);
-        });
-    });
+    
 
 
     peer.on('call', function (call) {
@@ -195,8 +183,31 @@
 
     function loadUsers(data) {
         console.log("Adding user to room: " + data);
-        $('#roomUsers').append("<h4>" + data + "</h4><button id=\"button" + data + "\"></button>");
+        //$('#roomUsers').append( data + "<audio controls></audio>");
+        $('#roomUsers').append("<br><button class=\"callButton\" type=\"button\">" + data + "</button>");
+        $('.callButton').click(function () {
+            console.log("Call initiated.");
 
+
+            var toCall = $(this).text();
+
+            console.log("Calling " + toCall);
+
+            navigator.getUserMedia({ video: true, audio: true }, function (stream) {
+                var call = peer.call(toCall, stream);
+                call.on('stream', function (remoteStream) {
+                    var video = document.querySelector('video');
+                    window.stream = remoteStream; // stream available to console
+                    if (window.URL) {
+                        video.src = window.URL.createObjectURL(remoteStream);
+                    } else {
+                        video.src = remoteStream;
+                    }
+                });
+            }, function (err) {
+                console.log('Failed to get local stream', err);
+            });
+        });
     }
 
     function unload() {
@@ -204,6 +215,21 @@
         chat.server.leave('@Model.UserName');
     }
 
+        var soundObject = null;
+
+        function PlaySound() {
+            //Don't play a message alert if the user is in the window
+            if (focus)
+                return;
+
+            if (soundObject == null) {
+                $('body').append("<audio id=\"soundPlayer\" src=\"/Content/Sounds/alert.wav\"></audio>");
+                soundObject = document.getElementById('soundPlayer');
+            }
+            console.log("Playing sound");
+        soundObject.play();
+
+        }
 
     </script>
 }
