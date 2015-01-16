@@ -9,6 +9,7 @@ namespace Prochat.WebAccess
 {
     public class Requests
     {
+
         public static HttpWebResponse SendWebRequest(string requestUrl)
         {
             HttpWebRequest request = (HttpWebRequest)
@@ -18,6 +19,7 @@ namespace Prochat.WebAccess
 
         }
 
+        //For when the return type needs a wrapper
         public static StreamReader GetJsonReader(string requestUrl)
         {
             return new StreamReader(SendWebRequest(requestUrl).GetResponseStream());

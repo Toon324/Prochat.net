@@ -1,12 +1,6 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using System.Web;
-using Microsoft.AspNet.SignalR;
+﻿using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
-using System.Linq;
-using Newtonsoft.Json;
-using System.IO;
-using System.Net;
+
 using System.Collections.Generic;
 
 
@@ -52,7 +46,10 @@ namespace Prochat.Hubs
 
         public void Join(string name)
         {
-            users.Add(name);
+            //Ensure no duplicate names on the list
+            if (!users.Contains(name))
+                 users.Add(name);
+
             UpdateUserLists();
         }
 
@@ -85,12 +82,7 @@ namespace Prochat.Hubs
             HandleMessage(name, message);
         }
 
-        private void HandleMessage(string name, string message)
-        {
-            HandleMessage(name, message, false);
-        }
-
-        private void HandleMessage(string name, string message, bool localOnly)
+        private void HandleMessage(string name, string message, bool localOnly = false)
         {
             if (message.Equals(""))
                 return; //Don't handle an empty message
