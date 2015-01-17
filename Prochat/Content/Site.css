@@ -47,7 +47,7 @@
 
     .strangerMessage {
         /* Full credit for gradient code goes to www.css3factory.com/linear-gradients/ */
-    background-image: -webkit-gradient(
+    /*background-image: -webkit-gradient(
 	linear,
 	left top,
 	left bottom,
@@ -58,11 +58,38 @@ background-image: -o-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
 background-image: -moz-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
 background-image: -webkit-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
 background-image: -ms-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
-background-image: linear-gradient(to bottom, #CFCFCF 0%, #EBEBEB 100%);
+background-image: linear-gradient(to bottom, #CFCFCF 0%, #EBEBEB 100%);*/
+
+       /*border: 1px solid;*/
+        box-shadow: 2px 2px 1px #888888;
+        margin: 2px;
     }
 
-    #message {
-        width: 90%;
+    .message {
+        box-shadow: 2px 2px 1px #898888;
+        margin: 2px;
+        min-height: 60px;
+        border-left: 1px solid rgba(34, 34, 34, 0.1);
+        background: #c6bfbf;
+    }
+
+    #messageName {
+        background: #333;
+        text-align: center;
+        color: white;
+        font: bold 12px "Lucida Grande", sans-serif;
+        border-radius: 5px;
+        height: 16px;
+        margin: 2px;
+    }
+
+    #messageContent {
+        border-left: 1px solid rgba(11, 11, 11, 0.15);
+        background: none repeat scroll 0% 0% rgb(213, 213, 213);
+    }
+    
+    .row-flex {
+        display: flex;
     }
 
 body {
@@ -93,7 +120,7 @@ header {
   position: relative;
   z-index: 1;
   text-align: center;
-  border: 1px solid #ddd\9; /* IE 8 and below */
+  border: 1px solid rgba(38, 36, 33, 0.87); /* IE 8 and below */
   background-image: linear-gradient(bottom, rgb(238,238,238) 0%, rgb(255,255,255) 100%);
   background-image: -o-linear-gradient(bottom, rgb(238,238,238) 0%, rgb(255,255,255) 100%);
   background-image: -moz-linear-gradient(bottom, rgb(238,238,238) 0%, rgb(255,255,255) 100%);
