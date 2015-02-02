@@ -22,9 +22,7 @@ namespace Prochat.Services
                 message = HandleTwitch(message);
             else if (message.Contains("soundcloud.com") && !message.Contains("oembed"))
                 message = HandleSoundcloud(message);
-            else if (Regex.Match(message, @"(.gif)(.gifv)").Success)
-                message = HandleGif(message);
-            else if (message.Contains(".png") || message.Contains(".jpg") || message.Contains(".gif"))
+            else if (message.Contains(".gif") || message.Contains(".gifv") || message.Contains(".png") || message.Contains(".jpg"))
                 message = HandleImage(message);
             else if (message.Contains("http"))
                 message = HandleLink(message);
@@ -62,17 +60,9 @@ namespace Prochat.Services
         private static string HandleImage(string message)
         {
             var url = Regex.Match(message, @"http\S*").ToString();
-            var embedded = "<img src=\"" + url + "\" style=\"width: 400px; height:300px\">";
-            message = message.Replace(url, Embed("Image", embedded));
-
-            return message;
-        }
-
-        private static string HandleGif(string message)
-        {
-            var url = Regex.Match(message, @"http\S*").ToString();
-            var embedded = "<img src=\"" + url + "\" style=\"width: 400px; height:300px\">";
-            message = message.Replace(url, Embed("Gif", embedded));
+            url = url.Replace("<br>", ""); //Ensure no whitespace
+            var embedded = "<img src=\"" + url + "\" style=\"width: 300px; height:200px\">";
+            message = message.Replace(url, Embed(WrapWithUrl(url, url), embedded));
 
             return message;
         }
@@ -92,11 +82,7 @@ namespace Prochat.Services
 
             var result = matches[num].ToString().Replace("embed_url\":\"", "").Replace("\",\"us", "").Replace("\\", "");
 
-            if (result.Equals(""))
-                return Embed(message, "Sorry, no matches found :(");
-
-            
-            return Embed(message, WrapWithIFrame(result, 350, 250));
+            return Embed(message, result.Equals("") ? "Sorry, no matches found :(" : WrapWithIFrame(result, 300, 200));
         }
 
         private static string HandleTwitch(string message)
@@ -114,6 +100,7 @@ namespace Prochat.Services
 
             var reader = WebAccess.Requests.GetJsonReader("http://soundcloud.com/oembed?url=" + data);
 
+            
             reader.ReadLine();
             reader.ReadLine();
             reader.ReadLine();
@@ -144,7 +131,7 @@ namespace Prochat.Services
         {
             var sub = Regex.Match(message, @"/r/\S*").ToString();
             var url = "https://www.reddit.com" + sub;
-            message = message.Replace(sub, WrapWithURL(url, sub));
+            message = message.Replace(sub, WrapWithUrl(url, sub));
             return message;
         }
 
@@ -170,7 +157,7 @@ namespace Prochat.Services
             return "<iframe width=\"" + width + "\" height=\"" + height + "\" scrolling=\"yes\" frameborder=\"no\" src=" + url + "></iframe>";
         }
 
-        private static string WrapWithURL(string url, string text)
+        private static string WrapWithUrl(string url, string text)
         {
             return "<a target=\"_blank\" href=\"" + url + "\" >" + text + "</a>";
         }

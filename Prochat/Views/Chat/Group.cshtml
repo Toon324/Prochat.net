@@ -8,9 +8,15 @@
 
     <div class="col-lg-2 leftRail">
         <h2>Chat controls</h2>
-        <br/><br/>
+        <br /><br />
         <div id="roomUsers">
-            <h3>Users in room</h3><hr>
+            <h3>Users in @Model.Group</h3><hr>
+            <h2>Currently in room @Model.Room</h2>
+            <h2>Rooms</h2>
+            @foreach (var room in Model.RoomsList)
+            {
+                <h4>@room</h4>
+            }
         </div>
 
 
@@ -19,8 +25,8 @@
     <div class="col-lg-8 chatContainer">
         <div id="discussion"></div>
         <div class="row">
-            <div class="col-md-12">
-                 @*<div id="editorToolbar" style="display: none;">
+            <div class="col-md-11">
+                @*<div id="editorToolbar" style="display: none;">
                         <header>
                             <ul class="commands">
                                 <li data-wysihtml5-command="bold" title="Make text bold (CTRL + B)" class="command"></li>
@@ -47,14 +53,12 @@
                         </header>
 
                     </div>*@
-                <div class="input-group">
-                    <input type="text" id="chatInput">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" id="sendmessage">Send</button>
-                    </span>
-                </div>
+                <textarea id="chatInput"></textarea>
 
-                </div>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-default" id="sendmessage">Send</button>
+            </div>
 
             <input type="hidden" id="displayname" />
         </div>
@@ -99,7 +103,7 @@
             $("#userContent").click(function() {
                 $.fn.showModal = function() {
                     if ($("#modal").length == 0) {
-                        
+
                     }
                 }
             });

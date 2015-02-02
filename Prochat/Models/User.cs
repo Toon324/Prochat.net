@@ -8,6 +8,8 @@ namespace Prochat
     public class User
     {
         public string UserName { get; set; }
-
+        public string Group { get; set; }
+        public string Room { get; set; }
+        public List<string> RoomsList { get; set; }
     }
 }
