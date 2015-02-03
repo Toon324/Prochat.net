@@ -36,7 +36,7 @@ namespace Prochat.Hubs
                    user = s;
                else
                {
-                   HandleMessage(user, s, true);
+                   //HandleMessage(user, s, true); //TODO: Update with relational history
                    user = "";
                }
                
@@ -73,16 +73,16 @@ namespace Prochat.Hubs
                 Clients.Caller.loadUsers(user);
         }
 
-        public void Send(string name, string message)
+        public void Send(string name, string group, string room, string message)
         {
             // Save to history
             if (historyEnabled)
-                DataAccess.ChatHistoryDatabaseConnector.AddToHistory(roomName, name, message);
+                DataAccess.ChatHistoryDatabaseConnector.AddToHistory(group, roomName, name, message);
 
-            HandleMessage(name, message);
+            HandleMessage(name, group, room, message);
         }
 
-        private void HandleMessage(string name, string message, bool localOnly = false)
+        private void HandleMessage(string name, string group, string room, string message, bool localOnly = false)
         {
             if (message.Equals(""))
                 return; //Don't handle an empty message
@@ -90,9 +90,9 @@ namespace Prochat.Hubs
             // Call the addNewMessageToPage method to update clients.
             message = ParseMessage(message);
             if (localOnly)
-                Clients.Caller.addNewMessageToPage(name, message, messageNumber);
+                Clients.Caller.addNewMessageToPage(name, group, room, message, messageNumber);
             else
-                Clients.All.addNewMessageToPage(name, message, messageNumber);
+                Clients.All.addNewMessageToPage(name, group, room, message, messageNumber);
             messageNumber++;
         }
 
@@ -100,15 +100,15 @@ namespace Prochat.Hubs
         {
             if (message.Equals("Prochat, show me your features"))
             {
-                Send("Prochat", "Hello, and welcome to Prochat! Here are the current awesome features you can enjoy:");
+                LocalSystemMessage("Hello, and welcome to Prochat! Here are the current awesome features you can enjoy:");
 
-                Send("Prochat", "You can also paste most Youtube video links and have them automagically embed. If a video isn't working, try using the link found in the \"Share\" tab on the video page.");
-                Send("Prochat", "http://youtu.be/SQoA_wjmE9w");
+                LocalSystemMessage("You can also paste most Youtube video links and have them automagically embed. If a video isn't working, try using the link found in the \"Share\" tab on the video page.");
+                LocalSystemMessage("http://youtu.be/SQoA_wjmE9w");
 
-                Send("Prochat", "Images such as png, jpg, and gif are all embedded as well. All embeded objects can be hidden and shown using the link found in the message.");
-                Send("Prochat", "http://i.imgur.com/p49J3rc.gif");
+                LocalSystemMessage( "Images such as png, jpg, and gif are all embedded as well. All embeded objects can be hidden and shown using the link found in the message.");
+                LocalSystemMessage( "http://i.imgur.com/p49J3rc.gif");
 
-                Send("Prochat", "Other links will simply be linked in the message, like so: http://www.google.com");
+                LocalSystemMessage( "Other links will simply be linked in the message, like so: http://www.google.com");
 
                 return "";
             }
@@ -118,7 +118,17 @@ namespace Prochat.Hubs
 
         public void Debug(string msg)
         {
-            Clients.All.addNewMessageToPage("Prochat Debugger", msg);
+            Clients.Caller.addNewMessageToPage("Prochat Debugger", msg);
+        }
+
+        public void LocalSystemMessage(string msg)
+        {
+            Clients.Caller.addNewMessageToPage("Prochat", msg);
+        }
+
+        public void SystemMessage(string msg)
+        {
+            Clients.All.addNewMessageToPage("Prochat", msg);
         }
     }
 }

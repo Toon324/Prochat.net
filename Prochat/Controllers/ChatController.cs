@@ -8,20 +8,13 @@ namespace Prochat.Controllers
 {
     public class ChatController : Controller
     {
-        public ActionResult Index(string id)
+        public ActionResult Index()
         {
             var username = Session["Username"] as string;
             if (username == null)
                 return RedirectToAction("proceedToLogin", "logout");
 
-           // var user = new User { UserName = username, Group = "Prochat", Room = "General" };
-            var user = new User {UserName = username, Group = id, Room = "General"};
-            return View(user);
-        }
-
-        public ActionResult Call()
-        {
-            return Call();
+            return RedirectToAction("Group", "Chat");
         }
 
         public ActionResult Group(string id)
@@ -29,6 +22,9 @@ namespace Prochat.Controllers
             var username = Session["Username"] as string;
             if (username == null)
                 return RedirectToAction("proceedToLogin", "logout");
+
+            if (String.IsNullOrEmpty(id))
+                id = "Prochat";
 
             var rooms = DataAccess.GroupsDatabaseConnector.GetListOfRoomsInGroup(id);
 
