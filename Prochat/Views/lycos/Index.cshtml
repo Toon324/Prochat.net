@@ -1,0 +1,38 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "LMLTFY";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row fullContainer" id="lycosContainer">
+    <div id="lycosSearchContainer">
+        <div id="lycosTextContainer">
+            <h2>Let me LYCOS that for you:</h2>
+        </div>
+
+        <div id="lycosInputContainer">
+            <img src="~/Content/Images/logo-homepage.png"/>
+            @Html.TextBox("lycosInput", "Enter search term...")
+            <img id="lycosSearchIcon" src="~/Content/Images/search.png"/>
+        </div>
+
+
+        <div id="lycosOutput" style="display: none;"></div>
+
+
+
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script>
+
+    $('#lycosSearchIcon').click(function () {
+        var link = "http://prochat.azurewebsites.net/lycos/Search/" + $('#lycosInput').val().replace(/ /g, "%20");
+        $('#lycosOutput').html("<h4>Use this link: <a href=\"" + link + "\">" + link + "</a></h4>");
+        $('#lycosOutput').show();
+    });
+</script>
+

@@ -1,0 +1,66 @@
+﻿@model Prochat.Models.LycosModel
+
+@{
+    ViewBag.Title = "LMLTFY";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row fullContainer" id="lycosContainer">
+    <div id="lycosSearchContainer">
+        <div id="lycosTextContainer">
+            <h2>Let me LYCOS that for you:</h2>
+        </div>
+
+        <div id="lycosInputContainer">
+            <img src="~/Content/Images/logo-homepage.png" />
+            @Html.TextBox("lycosInput", "Enter search term...")
+            <img id="lycosSearchIcon" src="~/Content/Images/search.png" />
+        </div>
+
+
+        <div id="lycosOutput"><h4>Step 1: Type in what you want to know</h4></div>
+        
+        <img id="cursor" src="~/Content/Images/cursor.png" style="width: 20px; height: 20px;"/>
+
+
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script>
+    window.onload = mainLoop;
+    function mainLoop() {
+        $("#cursor").css("margin-left", "400px").css("margin-top", "100px");
+        $('#lycosInput').val("Enter search term...");
+        var interval = setInterval(function () { firstMove(interval) }, 1000);
+    }
+
+    function firstMove(interval) {
+        $("#cursor").animate({
+            marginLeft: "250px",
+            marginTop: "-165px"
+        }, 1500, function () {
+            clearInterval(interval);
+            $('#lycosInput').val("@Model.SearchTerm.Replace("%20", "")");
+            $("#lycosOutput").html("<h4>Step 2: Hit search</h4>");
+            var interval2 = setInterval(function() { secondMove(interval2) }, 100);
+        });
+    }
+
+    function secondMove(interval) {
+        $("#cursor").animate({
+            marginLeft: "400px",
+            marginTop: "-175px"
+        }, 1000, function () {
+            clearInterval(interval);
+            $("#lycosOutput").html("<h4>Was that so hard?</h4>");
+            var interval3 = setInterval(function () { openPage(interval3) }, 300);
+        });
+    }
+
+    function openPage(invertal3) {
+        clearInterval(invertal3);
+        var url = "http://www.search.lycos.com/web/?q=@Model.SearchTerm.Replace("%20","")";
+        window.open(url, "_parent");
+    }
+</script>
