@@ -71,9 +71,16 @@ namespace Prochat.Services
         {
             var search = message.Replace("/gif ", "").Replace(" ", "+");
 
+
             var reader = WebAccess.Requests.GetJsonReader("http://api.giphy.com/v1/gifs/search?q=" + search + "&api_key=dc6zaTOxFJmzC");
 
+
             var response = reader.ReadLine();
+
+            if (String.IsNullOrEmpty(response))
+            {
+                return Embed(message, "Sorry, no results found :(");
+            }
 
             var matches = Regex.Matches(response, @"embed_url\S*us");
 

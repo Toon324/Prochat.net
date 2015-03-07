@@ -17,7 +17,7 @@ namespace Prochat.Controllers
             return RedirectToAction("Group", "Chat");
         }
 
-        public ActionResult Group(string id)
+        public ActionResult Group(string id, string room)
         {
             var username = Session["Username"] as string;
             if (username == null)
@@ -28,7 +28,10 @@ namespace Prochat.Controllers
 
             var rooms = DataAccess.GroupsDatabaseConnector.GetListOfRoomsInGroup(id);
 
-            var user = new User { UserName = username, Group = id, Room = "General", RoomsList = rooms };
+            if (String.IsNullOrEmpty(room))
+                room = "General";
+
+            var user = new User { UserName = username, Group = id, Room = room, RoomsList = rooms };
             return View(user);
         }
  

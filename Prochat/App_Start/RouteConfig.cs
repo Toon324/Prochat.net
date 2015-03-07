@@ -18,6 +18,11 @@ namespace Prochat
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+            routes.MapRoute(
+                name: "Group Chat",
+                url: "{controller}/{action}/{id}/{room}",
+                defaults: new {controller = "chat", action = "group", id = "Prochat", room = "General"}
+           );
         }
     }
 }
