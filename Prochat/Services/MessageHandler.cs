@@ -53,7 +53,7 @@ namespace Prochat.Services
             if (data.Contains("?"))
                 data = data.Substring(0, data.IndexOf("?"));
 
-            message = Embed("Youtube Video", "<embed width=\"420\" height=\"315\" src=\"http://www.youtube.com/v/" + data + "\">");
+            message = Embed(message, "<embed width=\"420\" height=\"315\" src=\"http://www.youtube.com/v/" + data + "\">");
 
             return message;
         }
@@ -62,8 +62,9 @@ namespace Prochat.Services
         {
             var url = Regex.Match(message, @"http\S*").ToString();
             url = url.Replace("<br>", ""); //Ensure no whitespace
-            var embedded = "<img src=\"" + url + "\" style=\"width: 300px; height:200px\">";
-            message = message.Replace(url, Embed(WrapWithUrl(url, url), embedded));
+            var embedded = "<a href=\"" + url + "\"><img src=\"" + url + "\" style=\"width: 300px; height:200px\"></a>";
+            //message = message.Replace(url, Embed(WrapWithUrl(url, url), embedded));
+            message = Embed(message, embedded);
 
             return message;
         }
@@ -98,7 +99,7 @@ namespace Prochat.Services
         {
             var data = Regex.Match(message, @"tv/\S*").ToString().Replace("tv/", "");
 
-            message = Embed("Twitch Stream", "<iframe src=\"http://www.twitch.tv/" + data + "/embed\" frameborder=\"0\" scrolling=\"no\" height=\"315\" width=\"420\"");
+            message = Embed(message, "<iframe src=\"http://www.twitch.tv/" + data + "/embed\" frameborder=\"0\" scrolling=\"no\" height=\"315\" width=\"420\"");
             return message;
         }
 
@@ -126,7 +127,7 @@ namespace Prochat.Services
             var s = reader.ReadLine();
 
             var src = Regex.Match(s, @"https.*").ToString();
-            return Embed("Soundcloud", "<iframe width=\"80%\" height=\"120\" scrolling=\"no\" frameborder=\"no\" src=" + src + "></iframe>");
+            return Embed(message, "<iframe width=\"80%\" height=\"120\" scrolling=\"no\" frameborder=\"no\" src=" + src + "></iframe>");
         }
 
         private static string HandleCommandIFrame(string message)

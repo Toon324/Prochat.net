@@ -87,7 +87,11 @@ namespace Prochat.Hubs
                 return; //Don't handle an empty message
 
             // Call the addNewMessageToPage method to update clients.
-            message = ParseMessage(message);
+            message = ParseMessage(group, room, message);
+
+            if (message.Equals(""))
+                return; 
+
             if (localOnly)
                 Clients.Caller.addNewMessageToPage(group, room, name, message, messageNumber);
             else
@@ -95,39 +99,37 @@ namespace Prochat.Hubs
             messageNumber++;
         }
 
-        private string ParseMessage(string message)
+        private string ParseMessage(string group, string room, string message)
         {
-            if (message.Equals("Prochat, show me your features"))
+            if (message.Equals("/features"))
             {
-                LocalSystemMessage("Hello, and welcome to Prochat! Here are the current awesome features you can enjoy:");
+                LocalSystemMessage("Hello, and welcome to Prochat! Here are the current awesome features you can enjoy:", group, room);
+                LocalSystemMessage("You can also paste most Youtube video links and have them automagically embed. If a video isn't working, try using the link found in the \"Share\" tab on the video page. http://youtu.be/SQoA_wjmE9w", group, room);
+                LocalSystemMessage("Images such as png, jpg, and gif are all embedded as well. All embeded objects can be hidden and shown using the link found in the message. http://i.imgur.com/p49J3rc.gif", group, room);
+                LocalSystemMessage("Other links will simply be linked in the message, like so: http://www.google.com", group, room);
+                LocalSystemMessage("Soundcloud links are also embedded: https://soundcloud.com/toon324/they-call-me-waluigi", group,room);
+                LocalSystemMessage("As are twitch streams: http://www.twitch.tv/twitchplayspokemon", group, room);
+                LocalSystemMessage("We also have several convenience methods for grabbing content. Please type /help for a full list.", group, room);
 
-                LocalSystemMessage("You can also paste most Youtube video links and have them automagically embed. If a video isn't working, try using the link found in the \"Share\" tab on the video page.");
-                LocalSystemMessage("http://youtu.be/SQoA_wjmE9w");
-
-                LocalSystemMessage( "Images such as png, jpg, and gif are all embedded as well. All embeded objects can be hidden and shown using the link found in the message.");
-                LocalSystemMessage( "http://i.imgur.com/p49J3rc.gif");
-
-                LocalSystemMessage( "Other links will simply be linked in the message, like so: http://www.google.com");
-
+                return "";
+            }
+            else if (message.Equals("/help"))
+            {
+                Clients.Caller.addNewMessageToPage(group, room, "Prochat", "<table> <tr><td>/gif {search term}</td><td>Returns a .gif from Giphy based on the search term.</td></tr></table>", 0);
                 return "";
             }
             else
                 return Services.MessageHandler.HandleMessage(message);
         }
 
-        public void Debug(string msg)
+        public void LocalSystemMessage(string msg, string group, string room)
         {
-            Clients.Caller.addNewMessageToPage("Prochat Debugger", msg);
+            HandleMessage(group, room, "Prochat", msg, true);
         }
 
-        public void LocalSystemMessage(string msg)
+        public void SystemMessage(string msg, string group, string room)
         {
-            Clients.Caller.addNewMessageToPage("Prochat", msg);
-        }
-
-        public void SystemMessage(string msg)
-        {
-            Clients.All.addNewMessageToPage("Prochat", msg);
+            HandleMessage(group, room, "Prochat", msg);
         }
     }
 }
