@@ -26,7 +26,7 @@
         <div id="discussion"></div>
         <div class="row">
             <div class="col-md-11">
-               
+
                 <textarea id="chatInput"></textarea>
 
             </div>
@@ -92,8 +92,14 @@
                 }
 
                 // Add the message to the page.
-                $("#discussion").append("<div id=\"" + name + messageNumber + "\" class=\"row row-flex row-flex-wrap message\"><div id=\"messageName\" class=\"col-md-1\">" + name
-                    + "</div><div id=\"messageContent\" class=\"col-md-11\">" + htmlEncode(message) + "</div>");
+
+                if (name === "@Model.UserName") {
+                    $("#discussion").append("<div id=\"" + name + messageNumber + "\" class=\"row row-flex row-flex-wrap message selfMessage\"><div id=\"messageName\" class=\"col-md-1\">" + name
+                        + "</div><div id=\"messageContent\" class=\"col-md-11\">" + htmlEncode(message) + "</div>");
+                } else {
+                    $("#discussion").append("<div id=\"" + name + messageNumber + "\" class=\"row row-flex row-flex-wrap message\"><div id=\"messageName\" class=\"col-md-1\">" + name
+                       + "</div><div id=\"messageContent\" class=\"col-md-11\">" + htmlEncode(message) + "</div>");
+                }
                 var elem = document.getElementById("discussion");
                 elem.scrollTop = elem.scrollHeight;
 

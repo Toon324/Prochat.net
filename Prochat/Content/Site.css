@@ -55,25 +55,7 @@
         width: 82px;
     }
 
-    .strangerMessage {
-        /* Full credit for gradient code goes to www.css3factory.com/linear-gradients/ */
-    /*background-image: -webkit-gradient(
-	linear,
-	left top,
-	left bottom,
-	color-stop(0, #CFCFCF),
-	color-stop(1, #EBEBEB)
-);
-background-image: -o-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
-background-image: -moz-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
-background-image: -webkit-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
-background-image: -ms-linear-gradient(bottom, #CFCFCF 0%, #EBEBEB 100%);
-background-image: linear-gradient(to bottom, #CFCFCF 0%, #EBEBEB 100%);*/
-
-       /*border: 1px solid;*/
-        box-shadow: 2px 2px 1px #888888;
-        margin: 2px;
-    }
+    
 
     .message {
         box-shadow: 2px 2px 1px #898888;
@@ -81,6 +63,10 @@ background-image: linear-gradient(to bottom, #CFCFCF 0%, #EBEBEB 100%);*/
         min-height: 60px;
         border-left: 1px solid rgba(34, 34, 34, 0.1);
         background: #c6bfbf;
+    }
+
+    .selfMessage {
+        background: none repeat scroll 0% 0% rgba(103, 236, 226, 0.64);
     }
 
     #messageName {
