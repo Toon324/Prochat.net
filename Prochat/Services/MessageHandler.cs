@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 
@@ -71,25 +72,26 @@ namespace Prochat.Services
         {
             var search = message.Replace("/gif ", "").Replace(" ", "+");
 
+            var client = new WebClient();
 
-            var reader = WebAccess.Requests.GetJsonReader("http://api.giphy.com/v1/gifs/search?q=" + search + "&api_key=dc6zaTOxFJmzC");
-
-
-            var response = reader.ReadLine();
-
+            var response = client.DownloadString("http://api.giphy.com/v1/gifs/search?q=" + search + "&api_key=dc6zaTOxFJmzC");
+          
             if (String.IsNullOrEmpty(response))
             {
-                return Embed(message, "Sorry, no results found :(");
+                return Embed(message, "Sorry, it seems the GIF service is temporarily down." + response + ".");
             }
 
             var matches = Regex.Matches(response, @"embed_url\S*us");
+
+            if (matches.Count == 0)
+                return Embed(message, "Sorry, no results found.");
 
             var random = new Random();
             var num = random.Next(matches.Count);
 
             var result = matches[num].ToString().Replace("embed_url\":\"", "").Replace("\",\"us", "").Replace("\\", "");
 
-            return Embed(message, result.Equals("") ? "Sorry, no matches found :(" : WrapWithIFrame(result, 300, 200));
+            return Embed(message, WrapWithIFrame(result, 300, 200));
         }
 
         private static string HandleTwitch(string message)

@@ -12,7 +12,7 @@ namespace Prochat.WebAccess
 
         public static HttpWebResponse SendWebRequest(string requestUrl)
         {
-            HttpWebRequest request = (HttpWebRequest)
+            var request = (HttpWebRequest)
                              WebRequest.Create(requestUrl);
 
             return request.GetResponse() as HttpWebResponse;
@@ -22,7 +22,8 @@ namespace Prochat.WebAccess
         //For when the return type needs a wrapper
         public static StreamReader GetJsonReader(string requestUrl)
         {
-            return new StreamReader(SendWebRequest(requestUrl).GetResponseStream());
+            var request = SendWebRequest(requestUrl);
+            return request == null ? null : new StreamReader(request.GetResponseStream());
         }
 
     }
