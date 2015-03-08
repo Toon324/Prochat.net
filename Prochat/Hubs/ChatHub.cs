@@ -12,7 +12,6 @@ namespace Prochat.Hubs
     {
         public static int messageNumber = 0;
         public static List<string> users = new List<string>();
-        private string roomName = "default";
         private bool historyEnabled = false;
 
         public void Hello()
@@ -20,12 +19,12 @@ namespace Prochat.Hubs
             Clients.All.hello();
         }
 
-        public void History()
+        public void GetHistory(string group, string room)
         {
             if (!historyEnabled)
                 return;
 
-           var history = DataAccess.ChatHistoryDatabaseConnector.GetHistory(roomName);
+           var history = DataAccess.ChatHistoryDatabaseConnector.GetHistory(group, room);
 
            string user = "";
 
@@ -73,16 +72,16 @@ namespace Prochat.Hubs
                 Clients.Caller.loadUsers(user);
         }
 
-        public void Send(string name, string group, string room, string message)
+        public void Send(string group, string room, string name, string message)
         {
             // Save to history
             if (historyEnabled)
-                DataAccess.ChatHistoryDatabaseConnector.AddToHistory(group, roomName, name, message);
+                DataAccess.ChatHistoryDatabaseConnector.AddToHistory(group, room, name, message);
 
-            HandleMessage(name, group, room, message);
+            HandleMessage(group, room, name, message);
         }
 
-        private void HandleMessage(string name, string group, string room, string message, bool localOnly = false)
+        private void HandleMessage(string group, string room, string name, string message, bool localOnly = false)
         {
             if (message.Equals(""))
                 return; //Don't handle an empty message
@@ -90,9 +89,9 @@ namespace Prochat.Hubs
             // Call the addNewMessageToPage method to update clients.
             message = ParseMessage(message);
             if (localOnly)
-                Clients.Caller.addNewMessageToPage(name, group, room, message, messageNumber);
+                Clients.Caller.addNewMessageToPage(group, room, name, message, messageNumber);
             else
-                Clients.All.addNewMessageToPage(name, group, room, message, messageNumber);
+                Clients.All.addNewMessageToPage(group, room, name, message, messageNumber);
             messageNumber++;
         }
 

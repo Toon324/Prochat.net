@@ -14,7 +14,7 @@ namespace Prochat.Controllers
             if (username == null)
                 return RedirectToAction("proceedToLogin", "logout");
 
-            return RedirectToAction("Group", "Chat");
+           return RedirectToAction("Group");
         }
 
         public ActionResult Group(string id, string room)

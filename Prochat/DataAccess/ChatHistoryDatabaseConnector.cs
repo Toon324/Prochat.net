@@ -9,9 +9,9 @@ namespace Prochat.DataAccess
 {
     public class ChatHistoryDatabaseConnector
     {
-        static SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["ProchatDatabase"].ToString());
+        static SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["UsersDatabase"].ToString());
 
-        public static List<string> GetHistory(string room)
+        public static List<string> GetHistory(string group, string room)
         {
             var query = string.Format("SELECT * FROM [ChatHistory] WHERE Room = '{0}'", room);
             var cmd = new SqlCommand(query, connection);        
@@ -34,7 +34,7 @@ namespace Prochat.DataAccess
 
         public static void AddToHistory(string group, string room, string user, string message)
         {
-            var query = string.Format("INSERT INTO [ChatHistory] VALUES ('{0}', '{1}', '{2}')", room, user, message); //TODO: Setup relational group-room id's for storing history.
+            var query = string.Format("INSERT INTO [ChatHistory] VALUES ('{0}', '{1}', '{2}')", room, user, message); //TODO: Relational group-room history storage.
             var cmd = new SqlCommand(query, connection);
 
             connection.Open();
