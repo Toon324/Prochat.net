@@ -113,13 +113,13 @@ namespace Prochat.Hubs
 
                 return "";
             }
-            else if (message.Equals("/help"))
+            if (message.StartsWith("/help"))
             {
-                Clients.Caller.addNewMessageToPage(group, room, "Prochat", "<table> <tr><td>/gif {search term}</td><td>Returns a .gif from Giphy based on the search term.</td></tr></table>", 0);
+                Clients.Caller.addNewMessageToPage(@group, room, "Prochat", "<table> <tr><td>/gif {search term}</td><td>Returns a .gif from Giphy based on the search term.</td></tr></table>", 0);
                 return "";
             }
-            else
-                return Services.MessageHandler.HandleMessage(message);
+
+            return Services.MessageHandler.HandleMessage(message);
         }
 
         public void LocalSystemMessage(string msg, string group, string room)

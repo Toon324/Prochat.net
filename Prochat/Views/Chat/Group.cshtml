@@ -15,7 +15,7 @@
             <h2>Rooms</h2>
             @foreach (var room in Model.RoomsList)
             {
-                <h4>@room</h4>
+                <h4 id="@room">@Html.ActionLink(@room, "Group", "Chat", new {room = @room, id = @Model.Group}, null)</h4>
             }
         </div>
 
@@ -40,12 +40,12 @@
 
     <div class="col-lg-2 rightRail">
         <div class="row">
-            <button id="userContent">Track content</button>
+            <div id="rightPaneContent" style="border: #000000 solid 1px; width: 300px; height: 200px; margin-top: 100px;"></div>
         </div>
-        <div class="row">
+        @*<div class="row">
             <button id="voiceCallRoom" class="btn btn-primary">Call Room</button>
-            @*<button id="videoCallRoom" class="btn btn-primary">Video Call Room</button>*@
-        </div>
+            <button id="videoCallRoom" class="btn btn-primary">Video Call Room</button>
+        </div>*@
     </div>
 
 
@@ -72,7 +72,10 @@
     <script type="text/javascript">
         var focus = true;
         $(function() {
-            var alertMessageInOtherRoom = function(group1, room1) { throw new Error("Not implemented"); };
+            var alertMessageInOtherRoom = function(group1, room1) {
+                $("#" + room1).append("<div id='roomMessageCount'>+</div>");
+            };
+
             $("#userContent").click(function() {
                 $.fn.showModal = function() {
                     if ($("#modal").length == 0) {
@@ -89,6 +92,7 @@
                 console.log("Adding message to " + group + " " + room + ". Current: @Model.Group @Model.Room");
                 if (!(group === "@Model.Group") || !(room === "@Model.Room")) {
                     alertMessageInOtherRoom(group, room);
+                    return;
                 }
 
                 // Add the message to the page.
@@ -116,6 +120,10 @@
                     }
 
                 });
+
+                $("#embedRight" + messageNumber).click(function() {
+                    $("#rightPaneContent").html($("#embedData" + messageNumber).html());
+                });
             };
 
             var username = "@Model.UserName";
@@ -137,7 +145,6 @@
             $("#chatInput").keypress(keypressHandler);
 
             $(window).unload(function() {
-                alert("Thanks for chatting!");
                 chat.server.leave("@Model.UserName");
             });
 
@@ -218,7 +225,7 @@
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
         var peer = new Peer("@Model.UserName", { key: "2kkgyhe7ky6z85mi" });
-        console.log("registered with peer name of @Model.UserName");
+        //console.log("registered with peer name of @Model.UserName");
 
 
         peer.on("call", function(call) {
@@ -241,7 +248,7 @@
 
 
         function keypressHandler(e) {
-            console.log("Key pressed: " + e.which);
+           // console.log("Key pressed: " + e.which);
             //Send if enter is pressed
             if (e.which === 13) {
                 if (e.shiftKey) {
@@ -257,7 +264,9 @@
 
         function sendMessage(chat) {
             // Call the Send method on the hub.
-            chat.server.send("@Model.Group", "@Model.Room", "@Model.UserName", $("#chatInput").val());
+            chat.server.send("@Model.Group", "@Model.Room", "@Model.UserName", $("#chatInput").val().trim());
+
+            console.log($("#chatInput").val().trim());
 
             // Clear text box and reset focus for next comment.
             $("#chatInput").val("").focus();

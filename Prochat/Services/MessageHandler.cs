@@ -15,7 +15,9 @@ namespace Prochat.Services
         {
             if (message.Contains("/r/"))
                 message = HandleReddit(message);
-            else if (Regex.Match(message, @"/gif").Success)
+            else if (message.StartsWith("/spotify"))
+                message = HandleSpotify(message);
+            else if (message.StartsWith("/gif"))
                 message = HandleGifCommand(message);
             else if (message.Contains("youtu.be") || message.Contains("youtube.com/watch?"))
                 message = HandleYoutube(message);
@@ -38,6 +40,11 @@ namespace Prochat.Services
 
             message = message.Replace(url, wrapped);
             return message;
+        }
+
+        private static string HandleSpotify(string message)
+        {
+            return Embed(message, "<iframe src=\"https://embed.spotify.com/?uri=spotify:track:0ffz9KBdCb7oJkSK0W7bbf\" width=\"300\" height=\"380\" frameborder=\"0\" allowtransparency=\"true\"></iframe>");
         }
 
         private static string HandleYoutube(string message)
@@ -154,15 +161,10 @@ namespace Prochat.Services
 
         private static string Embed(string type, string data)
         {
-            return "<div id=\"embedType\">" + type + " " + "<a id=\"embedToggle" + Hubs.ChatHub.messageNumber + "\"> Hide </a><br></div> <div id=\"embedData" + Hubs.ChatHub.messageNumber + "\">" + data + "</div>";
+            return "<div id=\"embedType\">" + type + " " + "<a id=\"embedToggle" + Hubs.ChatHub.messageNumber + "\"> Hide </a><a id=\"embedRight" +Hubs.ChatHub.messageNumber + "\"> Right Pane </a> <br></div> <div id=\"embedData" + Hubs.ChatHub.messageNumber + "\">" + data + "</div>";
         }
 
-        private static string WrapWithIFrame(string url)
-        {
-            return WrapWithIFrame(url, 420, 315);
-        }
-
-        private static string WrapWithIFrame(string url, int width, int height)
+        private static string WrapWithIFrame(string url, int width = 420, int height = 315)
         {
             return "<iframe width=\"" + width + "\" height=\"" + height + "\" scrolling=\"yes\" frameborder=\"no\" src=" + url + "></iframe>";
         }
