@@ -16,7 +16,7 @@
     <AssemblyName>Prochat</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -213,6 +213,7 @@
     <Compile Include="DataAccess\ChatHistoryDatabaseConnector.cs" />
     <Compile Include="DataAccess\GroupsDatabaseConnector.cs" />
     <Compile Include="DataAccess\UserDatabaseConnector.cs" />
+    <Compile Include="Models\ChatHistoryModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -238,6 +239,8 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="ApplicationInsights.config" />
+    <None Include="Properties\PublishProfiles\Prochat - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\Prochat - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\Prochat.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -308,7 +311,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>54006</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:53659/</IISUrl>
+          <IISUrl>http://prochat.dev.com</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

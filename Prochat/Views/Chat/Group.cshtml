@@ -266,7 +266,7 @@
             // Call the Send method on the hub.
             chat.server.send("@Model.Group", "@Model.Room", "@Model.UserName", $("#chatInput").val().trim());
 
-            console.log($("#chatInput").val().trim());
+            console.log("@Model.Group @Model.Room @Model.UserName " + $("#chatInput").val().trim() );
 
             // Clear text box and reset focus for next comment.
             $("#chatInput").val("").focus();

@@ -2,7 +2,8 @@
 using Microsoft.AspNet.SignalR.Hubs;
 
 using System.Collections.Generic;
-
+using System.Linq;
+using Prochat.DataAccess;
 
 
 namespace Prochat.Hubs
@@ -12,7 +13,7 @@ namespace Prochat.Hubs
     {
         public static int messageNumber = 0;
         public static List<string> users = new List<string>();
-        private bool historyEnabled = false;
+        private bool historyEnabled = true;
 
         public void Hello()
         {
@@ -24,22 +25,17 @@ namespace Prochat.Hubs
             if (!historyEnabled)
                 return;
 
-           var history = DataAccess.ChatHistoryDatabaseConnector.GetHistory(group, room);
+            var history = DataAccess.ChatHistoryDatabaseConnector.GetHistory(group, room);
 
-           string user = "";
+            if (!history.Any())
+                return;
 
-           foreach (string s in history)
-           {
-               //Simple parser that loads a username first then prints the message second, due to the fact the SQL connector currently returns everything as a 1-dimensional list.
-               if (user.Equals(""))
-                   user = s;
-               else
-               {
-                   //HandleMessage(user, s, true); //TODO: Update with relational history
-                   user = "";
-               }
-               
-           }
+            foreach (var message in history)
+            {
+                var groupId = GroupsDatabaseConnector.GetGroupIdOfRoom(message.RoomId);
+
+                HandleMessage(GroupsDatabaseConnector.GetGroupNameById(groupId), GroupsDatabaseConnector.GetRoomNameById(message.RoomId), message.Username, message.Message);
+            }
 
         }
 
